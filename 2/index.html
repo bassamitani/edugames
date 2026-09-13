@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Arena | Tug of War Series</title>
+    <!-- Importing modern typography -->
+    <link href="https://googleapis.com" rel="stylesheet">
+    <style>
+        /* Sleek Cyberpunk/Dark Mode Palette */
+        :root {
+            --primary: #3b82f6;       /* Vibrant neon blue */
+            --secondary: #94a3b8;     /* Muted slate text */
+            --bg: #0f172a;            /* Deep dark slate background */
+            --card-bg: #1e293b;       /* Card background */
+            --card-hover: #293548;    /* Card hover state */
+            --text: #f8fafc;          /* Off-white readable text */
+            --accent-glow: rgba(59, 130, 246, 0.15);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 40px 20px;
+            padding-top: 60px !important; /* Spacing for fixed ribbon */
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* News Ribbon Container */
+        .news-ribbon {
+            width: 100%;
+            background: #1e293b;
+            border-bottom: 1px solid #334155;
+            color: #ffffff;
+            overflow: hidden;
+            white-space: nowrap;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            padding: 12px 0;
+            font-size: 0.95rem;
+        }
+
+        /* Scrolling Text Wrapper */
+        .ribbon-content {
+            display: inline-block;
+            padding-left: 100%;
+            animation: scroll-left 45s linear infinite;
+        }
+
+        @keyframes scroll-left {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* Pause on hover */
+        .news-ribbon:hover .ribbon-content {
+            animation-play-state: paused;
+        }
+
+        header {
+            display: flex;
+            flex-direction: column; 
+            align-items: center;
+            text-align: center;
+            margin-bottom: 50px;
+            margin-top: 20px;
+            gap: 15px;
+        }
+
+        .header-text h1 {
+            font-size: 2rem;
+            color: #ffffff;
+            margin: 5px 0;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+
+        .header-text p {
+            color: var(--secondary);
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        /* Desktop Layout Override */
+        @media (min-width: 768px) {
+            header {
+                flex-direction: row;
+                justify-content: space-between;
+                text-align: left;
+            }
+            .header-text h1 {
+                font-size: 2.5rem;
+            }
+        }
+
+        /* Responsive Grid System */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 25px;
+        }
+
+        /* Game Navigation Cards */
+        .grade-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 25px;
+            text-decoration: none;
+            color: inherit;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Custom Left Border Accents Per Grade Tier */
+        .tier-elementary { border-left: 6px solid #10b981; } /* Emerald */
+        .tier-middle { border-left: 6px solid #f59e0b; }     /* Amber */
+        .tier-junior { border-left: 6px solid #ef4444; }     /* Red */
+
+        .grade-card:hover {
+            transform: translateY(-4px);
+            background: var(--card-hover);
+            box-shadow: 0 12px 20px -3px rgba(0, 0, 0, 0.4), 0 4px 12px var(--accent-glow);
+            border-color: var(--primary);
+        }
+
+        .grade-info h2 {
+            margin: 0;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .grade-info span {
+            font-size: 0.8rem;
+            color: var(--secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.075em;
+            font-weight: 600;
+        }
+
+        .arrow {
+            font-size: 1.5rem;
+            color: var(--primary);
+            transition: transform 0.2s ease;
+        }
+
+        .grade-card:hover .arrow {
+            transform: translateX(4px);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 80px;
+            color: var(--secondary);
+            font-size: 0.9rem;
+            border-top: 1px solid #334155;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Announcement Ribbon -->
+    <div class="news-ribbon">
+        <div class="ribbon-content">
+            🔥 <strong>ARENA ANNOUNCEMENT:</strong> Multi-level arithmetic challenges are live! Select your grade to play Tug of War.
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Dashboard Header -->
+        <header>
+            <div class="header-text">
+                <h1>Math Arena Battlegrounds</h1>
+                <p>Select your tier to enter the interactive Tug of War match</p>
+            </div>
+        </header>
+
+        <!-- Interactive Selection Grid -->
+        <div class="grid">
+            
+            <!-- Lower Elementary Tiers -->
+            <a href="Math Arena - grade 1b.html" class="grade-card tier-elementary">
+                <div class="grade-info">
+                    <span>Primary Level</span>
+                    <h2>Grade 1</h2>
+                </div>
+                <div class="arrow">→</div>
+            </a>
+
+            <a href="Math Arena - grade 2b.html" class="grade-card tier-elementary">
+                <div class="grade-info">
+                    <span>Primary Level</span>
+                    <h2>Grade 2</h2>
+                </div>
+                <div class="arrow">→</div>
+            </a>
+
+            <a href="Math Arena - grade 3b.html" class="grade-card tier-elementary">
+                <div class="grade-info">
+                    <span>Primary Level</span>
+                    <h2>Grade 3</h2>
+                </div>
+                <div class="arrow">→</div>
+            </a>
+
+            <!-- Upper Elementary / Middle Tiers -->
+            <a href="Math Arena - grade 4b.html" class="grade-card tier-middle">
+                <div class="grade-info">
+                    <span>Intermediate Level</span>
+                    <h2>Grade 4</h2>
+                </div>
+                <div class="arrow">→</div>
+            </a>
+
+            <a href="Math Arena - grade 5b.html" class="grade-card tier-middle">
+                <div class="grade-info">
+                    <span>Intermediate Level</span>
+                    <h2>Grade 5</h2>
+                </div>
+                <div class="arrow">→</div>
+            </a>
+
+            <a href="Math Arena - grade 6b.html" class="grade-card tier-middle">
+                <div class="grade-info">
+                    <span>Intermediate Level</span>
+                    <h2>Grade 6</h2>
+                </div>
+                <div class="arrow">→</div>
+            </a>
+
+            <!-- Junior High Tiers -->
+            <a href="Math Arena - grade 7b.html" class="grade-card tier-junior">
+                <div class="grade-info">
+                    <span>Advanced Level</span>
+                    <h2>Grade 7</h2>
+                </div>
+                <div class="arrow">→</div>
+            </a>
+
+            <a href="Math Arena - grade 8b.html" class="grade-card tier-junior">
+                <div class="grade-info">
+                    <span>Advanced Level</span>
+                    <h2>Grade 8</h2>
+                </div>
+                <div class="arrow">→</div>
+            </a>
+
+        </div>
+
+        <footer>
+            &copy; 2026 Math Arena. All rights reserved. Smart Class Applications by: Bassam Itani.
+        </footer>
+    </div>
+
+</body>
+</html>

@@ -38,6 +38,69 @@
  .floating-score-pop { position: fixed !important; top: 40% !important; font-size: 55px !important; font-weight: 900 !important; z-index: 999999 !important; pointer-events: none !important; animation: scoreFadeUp 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important; text-shadow: 0 4px 12px rgba(0,0,0,0.5), 0 0 20px currentColor !important; white-space: nowrap; }
  .pop-p1 { left: 20% !important; color: #2563eb !important; } .pop-p2 { right: 20% !important; color: #dc2626 !important; }
  @keyframes scoreFadeUp { 0% { opacity: 0; transform: translateY(-20%) scale(0.5); } 20% { opacity: 1; transform: translateY(-50%) scale(1.3); } 80% { opacity: 1; transform: translateY(-60%) scale(1); } 100% { opacity: 0; transform: translateY(-90%) scale(0.8); } }
+
+/* Responsive adjustments ONLY for low-height mobile viewports in landscape (Level 1) */
+@media (max-height: 600px) and (max-width: 980px) {
+
+  /* 1. MCQ Mode: Convert vertical list into a compact 2x2 grid ONLY if active */
+  .mcq-grid:not(.hidden) {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-rows: repeat(2, 1fr) !important;
+    gap: 4px !important;
+    margin-top: 2px !important;
+  }
+
+  .mcq-btn {
+    width: 100% !important;
+    height: 100% !important;
+    padding: 6px 4px !important;
+    font-size: 14px !important;
+    border-radius: 6px !important;
+  }
+
+  /* 2. Keypad Mode: Compress layout spacing ONLY if active */
+  #p1-keypad-panel:not(.hidden),
+  #p2-keypad-panel:not(.hidden) {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+  }
+
+  /* Compact the internal 3x4 numbers grid row layouts */
+  #p1-numbers-grid:not(.hidden),
+  #p2-numbers-grid:not(.hidden) {
+    gap: 4px !important;
+  }
+
+  .key-btn {
+    padding: 6px 0 !important; /* Reduces vertical height thickness */
+    font-size: 16px !important;
+    border-radius: 4px !important;
+  }
+
+  /* Make the large blue/red Submit buttons compact */
+  #p1-submit-btn, #p2-submit-btn {
+    padding: 6px 0 !important;
+    margin-top: 4px !important;
+    font-size: 16px !important;
+  }
+
+  /* 3. Global Layout Balance Controls to maximize space */
+  #p1-formula-box, #p2-formula-box {
+    font-size: 22px !important;
+    padding: 4px !important;
+    margin: 4px 0 !important;
+    flex: 0.6 !important;
+  }
+
+  .answer-preview-screen {
+    height: 28px !important;
+    line-height: 28px !important;
+    margin-bottom: 4px !important;
+  }
+}
+
  </style>
 </head>
 <body>

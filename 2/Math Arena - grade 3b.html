@@ -48,65 +48,86 @@
  .pop-p2 { right: 20% !important; color: #dc2626 !important; }
  @keyframes scoreFadeUp { 0% { opacity: 0; transform: translateY(-20%) scale(0.5); } 20% { opacity: 1; transform: translateY(-50%) scale(1.3); } 80% { opacity: 1; transform: translateY(-60%) scale(1); } 100% { opacity: 0; transform: translateY(-90%) scale(0.8); } }
 
- /* Responsive adjustments ONLY for low-height mobile viewports in landscape (Level 4) */
-@media (max-height: 600px) and (max-width: 980px) {
+  /* 3. Trim the answer preview bar thickness ONLY if it is not hidden */
+  .answer-preview-screen:not(.hidden) {
+    display: flex !important;
+    min-height: 36px !important;
+    height: 36px !important;
+    line-height: 36px !important;
+    font-size: 20px !important;
+    margin-bottom: 6px !important;
+  }
 
-    /* 1. MCQ Panel: Convert vertical list into a compact 2x2 grid layout */
-    .mcq-grid:not(.hidden) {
-        display: grid !important;
-        grid-template-columns: repeat(2, 1fr) !important;
-        grid-template-rows: repeat(2, 1fr) !important;
-        gap: 4px !important;
-        margin-top: 2px !important;
-    }
 
-    .mcq-btn {
-        width: 100% !important;
-        height: 100% !important;
-        padding: 6px 4px !important;
-        font-size: 15px !important;
-        border-radius: 6px !important;
-    }
+ /* Responsive compression for Laptop Full Screen Mode and short viewports */
+@media (max-height: 840px) {
 
-    /* 2. Keypad Mode: Compress layout elements and fit matrix view */
-    #p1-keypad-panel, #p2-keypad-panel {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 4px !important;
-    }
+  /* 1. Squeeze out massive vertical whitespace gaps from the dashboard panels */
+  #game-screen > div {
+    padding: 10px 12px !important;
+    gap: 4px !important;
+  }
 
-    /* The 3x4 grid container holding keys 0-9, X, and R */
-    #p1-keypad-panel > div, #p2-keypad-panel > div {
-        gap: 4px !important; /* Tightens gaps between buttons */
-    }
+  /* 2. Compact the formula box size and text slightly */
+  #p1-formula-box, #p2-formula-box {
+    font-size: 26px !important;
+    padding: 6px !important;
+    margin: 6px 0 !important;
+    flex: 0.4 !important; /* Prevents the math question box from hoarding vertical room */
+  }
 
-    .key-btn {
-        padding: 6px 0 !important; /* Shrinks the key height paddings */
-        font-size: 15px !important;
-        border-radius: 4px !important;
-    }
+  /* 3. Trim the answer preview bar thickness */
+  .answer-preview-screen {
+    min-height: 36px !important;
+    height: 36px !important;
+    line-height: 36px !important;
+    font-size: 20px !important;
+    margin-bottom: 6px !important;
+  }
 
-    /* Force full-width blue submit button to adapt down nicely */
-    button[onclick^="submitAnswer"] {
-        padding: 6px 0 !important;
-        margin-top: 0px !important;
-        font-size: 15px !important;
-    }
+  /* 4. Drastically lower key button paddings from 16px down to a clean laptop size */
+  .key-btn {
+    padding: 8px 0 !important; /* Shaves off over 60px of height across the key grid */
+    font-size: 18px !important;
+    border-radius: 6px !important;
+  }
 
-    /* 3. Global Layout Balance Controls to save precious screen vertical space */
-    #p1-formula-box, #p2-formula-box {
-        font-size: 20px !important;
-        padding: 4px !important;
-        margin: 4px 0 !important;
-        flex: 0.6 !important;
-    }
+  /* Tighten numbers grid layout tracks */
+  #p1-numbers-grid, #p2-numbers-grid {
+    gap: 6px !important;
+  }
 
-    .answer-preview-screen {
-        height: 28px !important;
-        line-height: 28px !important;
-        margin-bottom: 4px !important;
-    }
+  /* Tighten comparison operators track */
+  #p1-operators-row, #p2-operators-row {
+    gap: 6px !important;
+    margin-top: 6px !important;
+  }
+
+  /* Shrink comparison buttons specifically so they match the rest of the grid */
+  #p1-operators-row .key-btn,
+  #p2-operators-row .key-btn {
+    padding: 8px 0 !important;
+  }
+
+  /* 5. Scale down the massive blue/red Submit buttons so they lift completely into view */
+  #p1-submit-btn, #p2-submit-btn {
+    padding: 10px 0 !important;
+    margin-top: 6px !important;
+    font-size: 18px !important;
+  }
+
+  /* 6. MCQ Grid Mode layout safety adjustment for laptops */
+  .mcq-grid:not(.hidden) {
+    gap: 6px !important;
+    margin-top: 6px !important;
+  }
+  .mcq-btn {
+    padding: 10px 6px !important;
+    font-size: 18px !important;
+  }
 }
+
+
  </style>
 </head>
 <body>
@@ -349,16 +370,25 @@
  document.getElementById('center-p1-label').innerText = config.p1Name;
  document.getElementById('center-p2-label').innerText = config.p2Name;
  if (config.inputMode === 'MCQ') {
- document.getElementById('p1-keypad-panel').classList.add('hidden');
- document.getElementById('p2-keypad-panel').classList.add('hidden');
- document.getElementById('p1-mcq-panel').classList.remove('hidden');
- document.getElementById('p2-mcq-panel').classList.remove('hidden');
- } else {
- document.getElementById('p1-keypad-panel').classList.remove('hidden');
- document.getElementById('p2-keypad-panel').classList.remove('hidden');
- document.getElementById('p1-mcq-panel').classList.add('hidden');
- document.getElementById('p2-mcq-panel').classList.add('hidden');
- }
+document.getElementById('p1-keypad-panel').classList.add('hidden');
+document.getElementById('p2-keypad-panel').classList.add('hidden');
+document.getElementById('p1-mcq-panel').classList.remove('hidden');
+document.getElementById('p2-mcq-panel').classList.remove('hidden');
+
+// Hides empty preview screens in MCQ mode
+document.getElementById('p1-preview').classList.add('hidden');
+document.getElementById('p2-preview').classList.add('hidden');
+} else {
+document.getElementById('p1-keypad-panel').classList.remove('hidden');
+document.getElementById('p2-keypad-panel').classList.remove('hidden');
+document.getElementById('p1-mcq-panel').classList.add('hidden');
+document.getElementById('p2-mcq-panel').classList.add('hidden');
+
+// Restores preview screens in Keypad mode
+document.getElementById('p1-preview').classList.remove('hidden');
+document.getElementById('p2-preview').classList.remove('hidden');
+}
+
 
  if(game.currentRound === 1 || !game.currentRound) {
  tournament.p1RoundsWon = 0;
@@ -426,26 +456,35 @@
  const p2Ops = document.getElementById('p2-operators-row');
  const p1Submit = document.getElementById('p1-submit-btn');
  const p2Submit = document.getElementById('p2-submit-btn');
- if (choice === 'fractioncomp' && config.inputMode === 'KEYPAD') {
- if(p1Num) p1Num.classList.add('hidden'); if(p2Num) p2Num.classList.add('hidden');
- if(p1Ops) { p1Ops.classList.remove('hidden'); p1Ops.style.marginTop = '0px'; p1Ops.querySelectorAll('button').forEach(b => b.style.padding = '35px 0'); }
- if(p2Ops) { p2Ops.classList.remove('hidden'); p2Ops.style.marginTop = '0px'; p2Ops.querySelectorAll('button').forEach(b => b.style.padding = '35px 0'); }
+
+
+
+if (config.inputMode === 'KEYPAD') {
+  if (choice === 'fractioncomp') {
+    if(p1Num) p1Num.classList.add('hidden'); if(p2Num) p2Num.classList.add('hidden');
+    if(p1Ops) { p1Ops.classList.remove('hidden'); p1Ops.style.marginTop = '0px'; p1Ops.querySelectorAll('button').forEach(b => b.style.padding = '35px 0'); }
+    if(p2Ops) { p2Ops.classList.remove('hidden'); p2Ops.style.marginTop = '0px'; p2Ops.querySelectorAll('button').forEach(b => b.style.padding = '35px 0'); }
+  }
+  else if (choice === 'fractionshaded') {
+    if(p1Num) { p1Num.classList.remove('hidden'); p1Num.style.gap = '6px'; p1Num.querySelectorAll('button').forEach(b => b.style.padding = '10px 0'); }
+    if(p2Num) { p2Num.classList.remove('hidden'); p2Num.style.gap = '6px'; p2Num.querySelectorAll('button').forEach(b => b.style.padding = '10px 0'); }
+    if(p1Ops) p1Ops.classList.add('hidden'); if(p2Ops) p2Ops.classList.add('hidden');
+    if(p1Submit) p1Submit.style.marginTop = '6px'; if(p2Submit) p2Submit.style.marginTop = '6px';
+  }
+  else {
+    if(p1Num) { p1Num.classList.remove('hidden'); p1Num.style.gap = '10px'; p1Num.querySelectorAll('button').forEach(b => b.style.padding = '16px 0'); }
+    if(p2Num) { p2Num.classList.remove('hidden'); p2Num.style.gap = '10px'; p2Num.querySelectorAll('button').forEach(b => b.style.padding = '16px 0'); }
+    if(p1Ops) { p1Ops.classList.remove('hidden'); p1Ops.style.marginTop = '10px'; p1Ops.querySelectorAll('button').forEach(b => b.style.padding = '12px 0'); }
+    if(p2Ops) { p2Ops.classList.remove('hidden'); p2Ops.style.marginTop = '10px'; p2Ops.querySelectorAll('button').forEach(b => b.style.padding = '12px 0'); }
+    if(p1Submit) p1Submit.style.marginTop = '10px'; if(p2Submit) p2Submit.style.marginTop = '10px';
+  }
+}
+
+if (config.inputMode === 'MCQ') { assembleMcqOptions(ans); }
+
  }
- else if (choice === 'fractionshaded' && config.inputMode === 'KEYPAD') {
- if(p1Num) { p1Num.classList.remove('hidden'); p1Num.style.gap = '6px'; p1Num.querySelectorAll('button').forEach(b => b.style.padding = '10px 0'); }
- if(p2Num) { p2Num.classList.remove('hidden'); p2Num.style.gap = '6px'; p2Num.querySelectorAll('button').forEach(b => b.style.padding = '10px 0'); }
- if(p1Ops) p1Ops.classList.add('hidden'); if(p2Ops) p2Ops.classList.add('hidden');
- if(p1Submit) p1Submit.style.marginTop = '6px'; if(p2Submit) p2Submit.style.marginTop = '6px';
- }
- else {
- if(p1Num) { p1Num.classList.remove('hidden'); p1Num.style.gap = '10px'; p1Num.querySelectorAll('button').forEach(b => b.style.padding = '16px 0'); }
- if(p2Num) { p2Num.classList.remove('hidden'); p2Num.style.gap = '10px'; p2Num.querySelectorAll('button').forEach(b => b.style.padding = '16px 0'); }
- if(p1Ops) { p1Ops.classList.remove('hidden'); p1Ops.style.marginTop = '10px'; p1Ops.querySelectorAll('button').forEach(b => b.style.padding = '12px 0'); }
- if(p2Ops) { p2Ops.classList.remove('hidden'); p2Ops.style.marginTop = '10px'; p2Ops.querySelectorAll('button').forEach(b => b.style.padding = '12px 0'); }
- if(p1Submit) p1Submit.style.marginTop = '10px'; if(p2Submit) p2Submit.style.marginTop = '10px';
- }
- if (config.inputMode === 'MCQ') { assembleMcqOptions(ans); }
- }
+
+
  function runLevel3SubStrategies(choice) {
  let stroke = '', ans = '', isText = false, plainText = '';
  if (choice === 'pattern') {

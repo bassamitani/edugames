@@ -39,65 +39,77 @@
  .pop-p1 { left: 20% !important; color: #2563eb !important; } .pop-p2 { right: 20% !important; color: #dc2626 !important; }
  @keyframes scoreFadeUp { 0% { opacity: 0; transform: translateY(-20%) scale(0.5); } 20% { opacity: 1; transform: translateY(-50%) scale(1.3); } 80% { opacity: 1; transform: translateY(-60%) scale(1); } 100% { opacity: 0; transform: translateY(-90%) scale(0.8); } }
 
-/* Responsive adjustments ONLY for low-height mobile viewports in landscape (Level 4) */
-@media (max-height: 600px) and (max-width: 980px) {
-
-    /* 1. MCQ Panel: Convert vertical list into a compact 2x2 grid layout */
-    .mcq-grid:not(.hidden) {
-        display: grid !important;
-        grid-template-columns: repeat(2, 1fr) !important;
-        grid-template-rows: repeat(2, 1fr) !important;
-        gap: 4px !important;
-        margin-top: 2px !important;
-    }
-
-    .mcq-btn {
-        width: 100% !important;
-        height: 100% !important;
-        padding: 6px 4px !important;
-        font-size: 15px !important;
-        border-radius: 6px !important;
-    }
-
-    /* 2. Keypad Mode: Compress layout elements and fit matrix view */
-    #p1-keypad-panel, #p2-keypad-panel {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 4px !important;
-    }
-
-    /* The 3x4 grid container holding keys 0-9, X, and R */
-    #p1-keypad-panel > div, #p2-keypad-panel > div {
-        gap: 4px !important; /* Tightens gaps between buttons */
-    }
-
-    .key-btn {
-        padding: 6px 0 !important; /* Shrinks the key height paddings */
-        font-size: 15px !important;
-        border-radius: 4px !important;
-    }
-
-    /* Force full-width blue submit button to adapt down nicely */
-    button[onclick^="submitAnswer"] {
-        padding: 6px 0 !important;
-        margin-top: 0px !important;
-        font-size: 15px !important;
-    }
-
-    /* 3. Global Layout Balance Controls to save precious screen vertical space */
-    #p1-formula-box, #p2-formula-box {
-        font-size: 20px !important;
-        padding: 4px !important;
-        margin: 4px 0 !important;
-        flex: 0.6 !important;
-    }
-
-    .answer-preview-screen {
-        height: 28px !important;
-        line-height: 28px !important;
-        margin-bottom: 4px !important;
-    }
+/* Prevent the answer preview box from shrinking or collapsing when empty */
+.answer-preview-screen:not(.hidden) {
+  display: flex !important;
+  flex-shrink: 0 !important;
+  min-height: 44px !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
+
+/* Height-responsive layout compression for Laptop Full Screen Mode */
+@media (max-height: 840px) {
+
+  /* 1. Reduce massive vertical padding inside the dashboard containers */
+  #game-screen > div {
+    padding: 10px 12px !important;
+    gap: 4px !important;
+  }
+
+  /* 2. Compact the math question formula box height and text */
+  #p1-formula-box, #p2-formula-box {
+    font-size: 26px !important;
+    padding: 6px !important;
+    margin: 6px 0 !important;
+    flex: 0.4 !important; /* Prevents the question box from hoarding vertical space */
+  }
+
+  /* 3. Trim the answer preview bar thickness when visible */
+  .answer-preview-screen:not(.hidden) {
+    min-height: 34px !important;
+    height: 34px !important;
+    line-height: 34px !important;
+    font-size: 18px !important;
+    margin-bottom: 6px !important;
+  }
+
+  /* 4. Drastically lower key button paddings from 16px down to a clean laptop size */
+  .key-btn {
+    padding: 8px 0 !important; /* Saves up to 60px of vertical room across the grid */
+    font-size: 18px !important;
+    border-radius: 6px !important;
+  }
+
+  /* Tighten grids and operator margins */
+  #p1-numbers-grid, #p2-numbers-grid {
+    gap: 6px !important;
+  }
+
+  #p1-operators-row, #p2-operators-row {
+    gap: 6px !important;
+    margin-top: 6px !important;
+  }
+
+  /* 5. Scale down the large blue/red Submit buttons to lift them away from the taskbar */
+  #p1-submit-btn, #p2-submit-btn {
+    padding: 10px 0 !important;
+    margin-top: 6px !important;
+    font-size: 18px !important;
+  }
+
+  /* 6. MCQ layout safety adjustments for compact screens */
+  .mcq-grid:not(.hidden) {
+    gap: 6px !important;
+    margin-top: 6px !important;
+  }
+  .mcq-btn {
+    padding: 10px 6px !important;
+    font-size: 18px !important;
+  }
+}
+
+
  </style>
 </head>
 <body>
@@ -341,16 +353,25 @@
  document.getElementById('center-p2-label').innerText = config.p2Name;
 
  if (config.inputMode === 'MCQ') {
- document.getElementById('p1-keypad-panel').classList.add('hidden');
- document.getElementById('p2-keypad-panel').classList.add('hidden');
- document.getElementById('p1-mcq-panel').classList.remove('hidden');
- document.getElementById('p2-mcq-panel').classList.remove('hidden');
- } else {
- document.getElementById('p1-keypad-panel').classList.remove('hidden');
- document.getElementById('p2-keypad-panel').classList.remove('hidden');
- document.getElementById('p1-mcq-panel').classList.add('hidden');
- document.getElementById('p2-mcq-panel').classList.add('hidden');
- }
+  document.getElementById('p1-keypad-panel').classList.add('hidden');
+  document.getElementById('p2-keypad-panel').classList.add('hidden');
+  document.getElementById('p1-mcq-panel').classList.remove('hidden');
+  document.getElementById('p2-mcq-panel').classList.remove('hidden');
+
+  // Hides the empty answer preview boxes during MCQ mode
+  document.getElementById('p1-preview').classList.add('hidden');
+  document.getElementById('p2-preview').classList.add('hidden');
+} else {
+  document.getElementById('p1-keypad-panel').classList.remove('hidden');
+  document.getElementById('p2-keypad-panel').classList.remove('hidden');
+  document.getElementById('p1-mcq-panel').classList.add('hidden');
+  document.getElementById('p2-mcq-panel').classList.add('hidden');
+
+  // Restores the answer preview boxes when inside Keypad mode
+  document.getElementById('p1-preview').classList.remove('hidden');
+  document.getElementById('p2-preview').classList.remove('hidden');
+}
+
 
  if(game.currentRound === 1 || !game.currentRound) {
  tournament.p1RoundsWon = 0;

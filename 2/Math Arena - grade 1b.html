@@ -548,27 +548,164 @@ document.getElementById('p2-preview').classList.remove('hidden');
  }
  function submitAnswer(p) { if (!game.roundActive) return; evaluateAnswer(p, p === 1 ? game.p1In : game.p2In); }
 
- function evaluateAnswer(p, str) {
- if (!game.roundActive) return;
+
+// --- ENGINE MATH EVALUATION LOOP WITH SPLIT-COLOR TRANSITION BREAK (L1) ---
+function evaluateAnswer(p, str) {
+ if (!game.roundActive) return; // Locks inputs instantly during the 1s delay
+
  let input = str.trim().toUpperCase(); let target = game.ans.trim().toUpperCase();
  if (input === target) {
- let pullSteps = 1;
- if (game.questionAge <= 5.0) pullSteps = 3;
- else if (game.questionAge <= 10.0) pullSteps = 2;
+     let pullSteps = 1;
+     if (game.questionAge <= 5.0) pullSteps = 3;
+     else if (game.questionAge <= 10.0) pullSteps = 2;
 
- if (p === 1) { game.modifier += pullSteps; triggerFloatingScorePop(1, '+' + pullSteps + ' steps'); }
- else { game.modifier -= pullSteps; triggerFloatingScorePop(2, '+' + pullSteps + ' steps'); }
- updateVisualPosition();
- if (Math.abs(game.modifier) >= 30) { resolveVictory(game.modifier > 0 ? 1 : 2); }
- else { game.questionAge = 0; generateQuestion(); }
+     if (p === 1) {
+         game.modifier += pullSteps;
+         triggerFloatingScorePop(1, '+' + pullSteps + ' steps');
+     } else {
+         game.modifier -= pullSteps;
+         triggerFloatingScorePop(2, '+' + pullSteps + ' steps');
+     }
+
+     updateVisualPosition();
+
+     if (Math.abs(game.modifier) >= 30) {
+         resolveVictory(game.modifier > 0 ? 1 : 2);
+     } else {
+         // 1. Activate the 1-second locked transition state
+         game.roundActive = false;
+
+         // 2. Fetch required display boxes
+         const b1 = document.getElementById('p1-formula-box');
+         const b2 = document.getElementById('p2-formula-box');
+         const pr1 = document.getElementById('p1-preview');
+         const pr2 = document.getElementById('p2-preview');
+
+         // Force flash formula panels emerald green via priority overrides
+         [b1, b2].forEach(b => {
+             if (b) {
+                 b.style.setProperty('background', '#d1fae5', 'important');
+                 b.style.setProperty('border-color', '#10b981', 'important');
+                 b.style.setProperty('transform', 'scale(1.03)', 'important');
+                 b.style.setProperty('transition', 'all 0.2s ease', 'important');
+             }
+         });
+
+         // 3. Highlight the correct choice option elements across both panels
+         let flashedButtons = [];
+
+         if (config.inputMode === 'MCQ') {
+             // Loop through all 4 MCQ slots for both Player 1 and Player 2
+             for (let i = 0; i < 4; i++) {
+                 const m1 = document.getElementById(`p1-opt-${i}`);
+                 const m2 = document.getElementById(`p2-opt-${i}`);
+
+                 // Process Player 1's correct button styling
+                 if (m1 && m1.innerText && m1.innerText.trim().toUpperCase() === target) {
+                     if (p === 1) { // Player 1 won the speed race -> Green
+                         m1.style.setProperty('background', '#10b981', 'important');
+                         m1.style.setProperty('border-color', '#059669', 'important');
+                         m1.style.setProperty('color', '#ffffff', 'important');
+                     } else {       // Player 1 lost -> Amber
+                         m1.style.setProperty('background', '#fef3c7', 'important');
+                         m1.style.setProperty('border-color', '#f59e0b', 'important');
+                         m1.style.setProperty('color', '#1e293b', 'important');
+                     }
+                     m1.style.setProperty('transform', 'scale(1.02)', 'important');
+                     flashedButtons.push(m1);
+                 }
+
+                 // Process Player 2's correct button styling
+                 if (m2 && m2.innerText && m2.innerText.trim().toUpperCase() === target) {
+                     if (p === 2) { // Player 2 won the round race -> Green
+                         m2.style.setProperty('background', '#10b981', 'important');
+                         m2.style.setProperty('border-color', '#059669', 'important');
+                         m2.style.setProperty('color', '#ffffff', 'important');
+                     } else {       // Player 2 lost -> Amber
+                         m2.style.setProperty('background', '#fef3c7', 'important');
+                         m2.style.setProperty('border-color', '#f59e0b', 'important');
+                         m2.style.setProperty('color', '#1e293b', 'important');
+                     }
+                     m2.style.setProperty('transform', 'scale(1.02)', 'important');
+                     flashedButtons.push(m2);
+                 }
+             }
+         } else {
+             // Keypad Preview mode split color highlights
+             if (pr1) {
+                 pr1.innerText = game.ans;
+                 pr1.style.setProperty('background', p === 1 ? '#d1fae5' : '#fef3c7', 'important');
+                 pr1.style.setProperty('border-color', p === 1 ? '#10b981' : '#f59e0b', 'important');
+                 pr1.style.setProperty('color', p === 1 ? '#065f46' : '#92400e', 'important');
+             }
+             if (pr2) {
+                 pr2.innerText = game.ans;
+                 pr2.style.setProperty('background', p === 2 ? '#d1fae5' : '#fef3c7', 'important');
+                 pr2.style.setProperty('border-color', p === 2 ? '#10b981' : '#f59e0b', 'important');
+                 pr2.style.setProperty('color', p === 2 ? '#065f46' : '#92400e', 'important');
+             }
+         }
+
+         // 4. Freeze display framing for exactly 1 second (1000ms)
+         setTimeout(() => {
+             // Reset main math boxes safely
+             [b1, b2].forEach(b => {
+                 if (b) {
+                     b.style.setProperty('background', '#f8fafc', '');
+                     b.style.setProperty('border-color', '#e2e8f0', '');
+                     b.style.setProperty('transform', 'scale(1)', '');
+                 }
+             });
+
+             // Restore previous button visuals
+             flashedButtons.forEach(btn => {
+                 if (btn) {
+                     btn.style.setProperty('background', '#f8fafc', '');
+                     btn.style.setProperty('border-color', '#cbd5e1', '');
+                     btn.style.setProperty('color', '#1e293b', '');
+                     btn.style.setProperty('transform', 'scale(1)', '');
+                 }
+             });
+
+             // Wipes preview entries back to blank windows
+             [pr1, pr2].forEach(pr => {
+                 if (pr) {
+                     pr.style.setProperty('background', '#ffffff', '');
+                     pr.style.setProperty('border-color', '#cbd5e1', '');
+                     pr.style.setProperty('color', '#1e293b', '');
+                 }
+             });
+
+             // Dynamic question cycle updates
+             game.questionAge = 0;
+             generateQuestion();
+
+             // Unlocks controls to resume gameplay
+             game.roundActive = true;
+         }, 1000);
+     }
  } else {
- if (p === 1) { game.modifier = Math.max(-35, game.modifier - 1); triggerFloatingScorePop(1, '-1 step'); }
- else { game.modifier = Math.min(35, game.modifier + 1); triggerFloatingScorePop(2, '-1 step'); }
- updateVisualPosition(); if (Math.abs(game.modifier) >= 30) resolveVictory(game.modifier > 0 ? 1 : 2);
+     if (p === 1) {
+         game.modifier = Math.max(-35, game.modifier - 1);
+         triggerFloatingScorePop(1, '-1 step');
+     } else {
+         game.modifier = Math.min(35, game.modifier + 1);
+         triggerFloatingScorePop(2, '-1 step');
+     }
+     updateVisualPosition();
+     if (Math.abs(game.modifier) >= 30) resolveVictory(game.modifier > 0 ? 1 : 2);
  }
- if (p === 1) { game.p1In = ''; document.getElementById('p1-preview').innerText = ''; }
- else { game.p2In = ''; document.getElementById('p2-preview').innerText = ''; }
+
+ // Level 1 original input flushing clean routine lines
+ if (p === 1) {
+     game.p1In = '';
+     document.getElementById('p1-preview').innerText = '';
+ } else {
+     game.p2In = '';
+     document.getElementById('p2-preview').innerText = '';
  }
+}
+
 
  function triggerFloatingScorePop(p, txt) {
  const pop = document.createElement('div'); pop.className = 'floating-score-pop pop-p' + p; pop.innerText = txt;

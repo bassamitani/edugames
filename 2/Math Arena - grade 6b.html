@@ -675,43 +675,160 @@ function selectMcq(p, idx) {
 }
 function submitAnswer(p) { evaluate(p, p === 1 ? game.p1In : game.p2In); }
 
-// --- ENGINE MATH EVALUATION LOOP ---
-function evaluate(p, str) {
- if(!game.roundActive) return;
- if(str.trim() === game.ans.trim()) {
- let pullSteps = 1;
- if (game.questionAge <= 5.0) pullSteps = 3;
- else if (game.questionAge <= 10.0) pullSteps = 2;
 
- if (p === 1) {
- game.modifier += pullSteps;
- triggerFloatingScorePop(1, `+${pullSteps} steps`);
+// --- ENGINE MATH EVALUATION LOOP WITH DUAL-COLOR BREAK TRANSITION ---
+function evaluate(p, str) {
+ if (!game.roundActive) return; // Locks inputs instantly during the 1-second delay
+
+ if (str.trim() === game.ans.trim()) {
+     let pullSteps = 1;
+     if (game.questionAge <= 5.0) pullSteps = 3;
+     else if (game.questionAge <= 10.0) pullSteps = 2;
+
+     if (p === 1) {
+         game.modifier += pullSteps;
+         triggerFloatingScorePop(1, `+${pullSteps} steps`);
+     } else {
+         game.modifier -= pullSteps;
+         triggerFloatingScorePop(2, `+${pullSteps} steps`);
+     }
+
+     updateVisualPosition();
+
+     if (!checkOffScreenWinCondition()) {
+         // 1. Activate the 1-second locked transition state
+         game.roundActive = false;
+
+         // 2. Fetch required layout display nodes
+         const b1 = document.getElementById('p1-formula-box');
+         const b2 = document.getElementById('p2-formula-box');
+         const pr1 = document.getElementById('p1-preview');
+         const pr2 = document.getElementById('p2-preview');
+
+         // 3. Flash formula blocks using high-priority styles
+         [b1, b2].forEach(b => {
+             if (b) {
+                 b.style.setProperty('background', '#d1fae5', 'important');
+                 b.style.setProperty('border-color', '#10b981', 'important');
+                 b.style.setProperty('transform', 'scale(1.02)', 'important');
+                 b.style.setProperty('transition', 'all 0.2s ease', 'important');
+             }
+         });
+
+         // 4. Highlight correct answer elements based on who won the race
+         let flashedButtons = [];
+         let targetAns = game.ans.trim().toLowerCase();
+
+         if (config.input === 'mcq') {
+             for (let i = 0; i < 4; i++) {
+                 const m1 = document.getElementById(`p1-mcq-${i}`);
+                 const m2 = document.getElementById(`p2-mcq-${i}`);
+
+                 // Player 1 has matching answer button
+                 if (m1 && m1.dataset.value && m1.dataset.value.trim().toLowerCase() === targetAns) {
+                     if (p === 1) { // Player 1 won the race -> Green
+                         m1.style.setProperty('background', '#10b981', 'important');
+                         m1.style.setProperty('border-color', '#059669', 'important');
+                     } else {       // Player 1 lost the race -> Amber
+                         m1.style.setProperty('background', '#fef3c7', 'important');
+                         m1.style.setProperty('border-color', '#f59e0b', 'important');
+                     }
+                     m1.style.setProperty('color', '#1e293b', 'important');
+                     m1.style.setProperty('transform', 'scale(1.02)', 'important');
+                     flashedButtons.push(m1);
+                 }
+
+                 // Player 2 has matching answer button
+                 if (m2 && m2.dataset.value && m2.dataset.value.trim().toLowerCase() === targetAns) {
+                     if (p === 2) { // Player 2 won the race -> Green
+                         m2.style.setProperty('background', '#10b981', 'important');
+                         m2.style.setProperty('border-color', '#059669', 'important');
+                     } else {       // Player 2 lost the race -> Amber
+                         m2.style.setProperty('background', '#fef3c7', 'important');
+                         m2.style.setProperty('border-color', '#f59e0b', 'important');
+                     }
+                     m2.style.setProperty('color', '#1e293b', 'important');
+                     m2.style.setProperty('transform', 'scale(1.02)', 'important');
+                     flashedButtons.push(m2);
+                 }
+             }
+         } else {
+             // Keypad Entry variant: Reveal dynamic values inside side panels split via color
+             if (pr1) {
+                 pr1.innerText = game.ans;
+                 pr1.style.setProperty('background', p === 1 ? '#d1fae5' : '#fef3c7', 'important');
+                 pr1.style.setProperty('border-color', p === 1 ? '#10b981' : '#f59e0b', 'important');
+                 pr1.style.setProperty('color', p === 1 ? '#065f46' : '#92400e', 'important');
+             }
+             if (pr2) {
+                 pr2.innerText = game.ans;
+                 pr2.style.setProperty('background', p === 2 ? '#d1fae5' : '#fef3c7', 'important');
+                 pr2.style.setProperty('border-color', p === 2 ? '#10b981' : '#f59e0b', 'important');
+                 pr2.style.setProperty('color', p === 2 ? '#065f46' : '#92400e', 'important');
+             }
+         }
+
+         // 5. Hold frame configuration for exactly 1 second (1000ms)
+         setTimeout(() => {
+             // Safely reset formula box structures
+             [b1, b2].forEach(b => {
+                 if (b) {
+                     b.style.setProperty('background', '#f8fafc', '');
+                     b.style.setProperty('border-color', '#e2e8f0', '');
+                     b.style.setProperty('transform', 'scale(1)', '');
+                 }
+             });
+
+             // Restore old button states cleanly
+             flashedButtons.forEach(btn => {
+                 if (btn) {
+                     btn.style.setProperty('background', '#f8fafc', '');
+                     btn.style.setProperty('border-color', '#cbd5e1', '');
+                     btn.style.setProperty('color', '#1e293b', '');
+                     btn.style.setProperty('transform', 'scale(1)', '');
+                 }
+             });
+
+             // Wipes input preview frames
+             [pr1, pr2].forEach(pr => {
+                 if (pr) {
+                     pr.innerText = "";
+                     pr.style.setProperty('background', '#ffffff', '');
+                     pr.style.setProperty('border-color', '#cbd5e1', '');
+                     pr.style.setProperty('color', '#1e293b', '');
+                 }
+             });
+
+             // Dynamic question tracking rotation parameters
+             game.questionAge = 0;
+             generateQuestion();
+             game.p1In = "";
+             game.p2In = "";
+
+             // Lift script block to accept player control inputs again
+             game.roundActive = true;
+         }, 1000);
+     }
  } else {
- game.modifier -= pullSteps;
- triggerFloatingScorePop(2, `+${pullSteps} steps`);
- }
- updateVisualPosition();
- if (!checkOffScreenWinCondition()) {
- game.questionAge = 0;
- generateQuestion();
- game.p1In = ""; game.p2In = "";
- const pr1 = document.getElementById('p1-preview');
- const pr2 = document.getElementById('p2-preview');
- if (pr1) pr1.innerText = ""; if (pr2) pr2.innerText = "";
- }
- } else {
- if(p === 1) {
- game.modifier = Math.max(-35, game.modifier - 1); game.p1In = "";
- const pr = document.getElementById('p1-preview'); if(pr) pr.innerText = "";
- triggerFloatingScorePop(1, `-1 step`);
- } else {
- game.modifier = Math.min(35, game.modifier + 1); game.p2In = "";
- const pr = document.getElementById('p2-preview'); if(pr) pr.innerText = "";
- triggerFloatingScorePop(2, `-1 step`);
- }
- updateVisualPosition(); checkOffScreenWinCondition();
+     // Penalty Rules for entering incorrect items
+     if (p === 1) {
+         game.modifier = Math.max(-35, game.modifier - 1);
+         game.p1In = "";
+         const pr = document.getElementById('p1-preview');
+         if (pr) pr.innerText = "";
+         triggerFloatingScorePop(1, `-1 step`);
+     } else {
+         game.modifier = Math.min(35, game.modifier + 1);
+         game.p2In = "";
+         const pr = document.getElementById('p2-preview');
+         if (pr) pr.innerText = "";
+         triggerFloatingScorePop(2, `-1 step`);
+     }
+     updateVisualPosition();
+     checkOffScreenWinCondition();
  }
 }
+
 
 function triggerFloatingScorePop(p, txt) {
  const parent = document.getElementById('game-screen'); if(!parent) return;

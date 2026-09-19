@@ -405,15 +405,23 @@ document.getElementById('p2-preview').classList.remove('hidden');
  let stroke = '', ans = '', isTextQuestion = false, plainText = '';
  let choice = config.pool[Math.floor(Math.random() * config.pool.length)];
  if (choice === 'whole10k') {
- let op = Math.random() > 0.5 ? '+' : '-';
- if (op === '+') {
- let v1 = Math.floor(Math.random() * 4500) + 500; let v2 = Math.floor(Math.random() * 4500) + 500;
- stroke = v1 + ' + ' + v2 + ' = ?'; ans = (v1 + v2).toString();
- } else {
- let v1 = Math.floor(Math.random() * 8000) + 1500; let v2 = Math.floor(Math.random() * (v1 - 100)) + 100;
- stroke = v1 + ' - ' + v2 + ' = ?'; ans = (v1 - v2).toString();
- }
- } else if (choice === 'mul2d1d') {
+let op = Math.random() > 0.5 ? '+' : '-';
+if (op === '+') {
+    // Generates values from 100 to 499 (Keeping the sum strictly in the hundreds)
+    let v1 = Math.floor(Math.random() * 400) + 100;
+    let v2 = Math.floor(Math.random() * 400) + 100;
+    stroke = v1 + ' + ' + v2 + ' = ?'; ans = (v1 + v2).toString();
+} else {
+    // Generates a starting number from 200 to 999
+    let v1 = Math.floor(Math.random() * 800) + 200;
+    // Generates a sub-number smaller than v1, but at least 100
+    let v2 = Math.floor(Math.random() * (v1 - 100)) + 100;
+    stroke = v1 + ' - ' + v2 + ' = ?'; ans = (v1 - v2).toString();
+}
+}
+
+
+  else if (choice === 'mul2d1d') {
  let v1 = Math.floor(Math.random() * 89) + 11; let v2 = Math.floor(Math.random() * 8) + 2;
  stroke = v1 + ' \\times ' + v2 + ' = ?'; ans = (v1 * v2).toString();
  } else if (choice === 'assoc3') {
@@ -581,13 +589,16 @@ function evaluateAnswer(p, str) {
      if (game.questionAge <= 5.0) pullSteps = 3;
      else if (game.questionAge <= 10.0) pullSteps = 2;
 
-     if (p === 1) {
-         game.modifier += pullSteps;
-         triggerFloatingScorePop(1, '+' + pullSteps + ' steps');
-     } else {
-         game.modifier -= pullSteps;
-         triggerFloatingScorePop(2, '+' + pullSteps + ' steps');
-     }
+ if (p === 1) {
+     game.modifier += pullSteps;
+ } else {
+     game.modifier -= pullSteps;
+ }
+
+ // Selects singular or plural based on the dynamic step value
+ let dynamicLabel = pullSteps === 1 ? 'step' : 'steps';
+ triggerFloatingScorePop(p === 1 ? 1 : 2, `+${pullSteps} ${dynamicLabel}`);
+
 
      updateVisualPosition();
 

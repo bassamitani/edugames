@@ -885,13 +885,16 @@ function evaluate(p, str) {
      // Apply pulling mechanics directly to the game modifier and scores
      if (p === 1) {
          tournament.p1CumulativeScore += reward;
-         game.modifier += reward; // Pulls +3, +2, or +1 steps
-         triggerFloatingScorePop(1, `+${reward} steps`);
+         game.modifier += reward;
      } else {
          tournament.p2CumulativeScore += reward;
-         game.modifier -= reward; // Pulls +3, +2, or +1 steps
-         triggerFloatingScorePop(2, `+${reward} steps`);
+         game.modifier -= reward;
      }
+
+     // Dynamically switches to singular 'step' if the reward is exactly 1
+     let rewardLabel = reward === 1 ? 'step' : 'steps';
+     triggerFloatingScorePop(p === 1 ? 1 : 2, `+${reward} ${rewardLabel}`);
+
 
      syncScoreboardDisplays();
      updateVisualPosition();
@@ -1019,18 +1022,18 @@ function evaluate(p, str) {
          game.p1In = '';
          const pr = document.getElementById('p1-preview');
          if (pr) pr.innerText = '';
+         triggerFloatingScorePop(1, `-1 step`); // 👈 ADD THIS LINE FOR P1
      } else {
          game.modifier = Math.min(30, game.modifier + 1);
          game.p2In = '';
          const pr = document.getElementById('p2-preview');
          if (pr) pr.innerText = '';
+         triggerFloatingScorePop(2, `-1 step`); // 👈 ADD THIS LINE FOR P2
      }
      updateVisualPosition();
      checkOffScreenWinCondition();
   }
 }
-
-
 
 
 function triggerFloatingScorePop(p, txt) {

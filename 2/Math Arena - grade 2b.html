@@ -584,13 +584,16 @@ function evaluateAnswer(p, str) {
      if (game.questionAge <= 5.0) pullSteps = 3;
      else if (game.questionAge <= 10.0) pullSteps = 2;
 
-     if (p === 1) {
-         game.modifier += pullSteps;
-         triggerFloatingScorePop(1, '+' + pullSteps + ' steps');
-     } else {
-         game.modifier -= pullSteps;
-         triggerFloatingScorePop(2, '+' + pullSteps + ' steps');
-     }
+  if (p === 1) {
+     game.modifier += pullSteps;
+ } else {
+     game.modifier -= pullSteps;
+ }
+
+ // Selects singular or plural based on the dynamic step value
+ let dynamicLabel = pullSteps === 1 ? 'step' : 'steps';
+ triggerFloatingScorePop(p === 1 ? 1 : 2, `+${pullSteps} ${dynamicLabel}`);
+
 
      updateVisualPosition();
 

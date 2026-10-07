@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Arithmetricks 6</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+        <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+ <!-- KaTeX Auto-Render Extension with Custom Delimiter Config -->
+        <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+                onload="renderMathInElement(document.body, {
+                        delimiters: [
+                                {left: '$$', right: '$$', display: true},
+                                {left: '$', right: '$', display: false},
+                                {left: '\\(', right: '\\)', display: false},
+                                {left: '\\[', right: '\\]', display: true}
+                        ],
+                        throwOnError: false
+                });">
+                </script>
+
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --panel-bg: #1e293b;
+            --border-color: #334155;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+        .screen { display: none; width: 100%; padding: 16px; flex-direction: column; justify-content: flex-start; align-items: center; min-height: 100vh; }
+        .screen.active { display: flex; }
+        .card { background-color: var(--panel-bg); border: 1px solid var(--border-color); padding: 24px; border-radius: 16px; width: 100%; max-width: 500px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); margin-top: 14px; }
+        h1, h2, h3 { text-align: center; margin-bottom: 14px; }
+        .game-title-header { font-size: 26px; font-weight: 900; background: linear-gradient(to right, #3b82f6, #10b981); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-align: center; margin-bottom: 8px; letter-spacing: 0.5px; }
+        .btn { padding: 13px 22px; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: background 0.2s ease, transform 0.1s ease; color: white; text-align: center; display: inline-block; text-decoration: none; }
+        .btn:active { transform: scale(0.98); }
+        .btn-blue { background-color: var(--accent-blue); }
+        .btn-blue:hover { background-color: #2563eb; }
+        .btn-slate { background-color: #475569; }
+        .btn-slate:hover { background-color: #334155; }
+        .team-input-box { width: 100%; padding: 11px; margin-top: 5px; background: #0f172a; border: 1px solid var(--border-color); border-radius: 6px; color: #fff; font-size: 16px; }
+        .range-container { display: flex; gap: 8px; align-items: center; margin-top: 5px; }
+        .range-container input { width: 50%; }
+        .game-header { width: 100%; max-width: 500px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; background: var(--panel-bg); padding: 11px 8px; border-radius: 12px; border: 1px solid var(--border-color); }
+        .stat-box { display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: bold; margin-bottom: 2px; }
+        .stat-val { font-size: 22px; font-weight: 900; color: #fff; font-variant-numeric: tabular-nums; }
+        #stat-timer { color: #f59e0b; }
+        #stat-score { color: var(--accent-green); }
+        .formula-card { width: 100%; max-width: 500px; background: #fff; color: var(--bg-dark); border-radius: 12px; min-height: 90px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 32px; font-weight: bold; padding: 15px; margin-bottom: 15px; box-shadow: inset 0 2px 8px rgba(0,0,0,0.06); text-align: center; }
+        .mcq-container { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 10px; }
+        .mcq-choice-btn { width: 100%; background: var(--panel-bg); color: #fff; border: 2px solid var(--border-color); font-size: 20px; font-weight: bold; border-radius: 11px; cursor: pointer; padding: 14px; text-align: center; transition: background 0.15s, border-color 0.15s; }
+        .mcq-choice-btn:active { border-color: var(--accent-blue); background: #23314f; }
+        @keyframes popGreen { 0% { background: var(--accent-green); } 100% { background: var(--panel-bg); } }
+        @keyframes popRed { 0% { background: var(--accent-red); } 100% { background: var(--panel-bg); } }
+    </style>
+</head>
+<body>
+    <!-- Menu Screen -->
+    <div id="menu-screen" class="screen active">
+        <div style="margin-top: 60px;"></div>
+        <div class="card" style="text-align: center;">
+            <h1 class="game-title-header" style="font-size: 36px; margin-bottom: 4px;">ARITHMETRICKS</h1>
+            <p style="color: var(--text-muted); font-weight: bold; font-size: 14px; margin-bottom: 24px;">Multiplication Speed Trainer</p>
+            <button class="btn btn-blue" style="width: 100%; padding: 16px; font-size: 18px;" onclick="showScreen('settings-screen')">Configure Engine Matrix</button>
+        </div>
+    </div>
+
+    <!-- Settings Screen -->
+    <div id="settings-screen" class="screen">
+        <div class="card">
+            <h2 style="color: #fff; font-weight: 800; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 20px;">Game Configuration</h2>
+
+            <div style="margin-bottom: 16px;">
+                <label style="font-size:13px; font-weight:bold; color: var(--text-muted);">Player Identity Handle:</label>
+                <input type="text" id="player-name-input" value="Mathematician" class="team-input-box">
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+                <div style="flex: 1;">
+                    <label style="font-size:13px; font-weight:bold; color: var(--text-muted);">Target Questions:</label>
+                    <input type="number" id="target-questions" value="10" min="1" max="100" class="team-input-box">
+                </div>
+                <div style="flex: 1;">
+                    <label style="font-size: 13px; font-weight:bold; color: var(--text-muted);">Time Limit (Secs):</label>
+                    <input type="number" id="time-limit" value="60" min="10" max="600" class="team-input-box">
+                </div>
+            </div>
+
+            <!-- Custom Number Range Adjusters -->
+            <div style="margin-bottom: 16px;">
+                <label style="font-size:13px; font-weight:bold; color: var(--text-muted);">First Number Range (1 - 100):</label>
+                <div class="range-container">
+                    <input type="number" id="num1-min" value="2" min="1" max="100" class="team-input-box" placeholder="Min">
+                    <span style="color: var(--text-muted)">to</span>
+                    <input type="number" id="num1-max" value="9" min="1" max="100" class="team-input-box" placeholder="Max">
+                </div>
+            </div>
+
+            <div style="margin-bottom: 24px;">
+                <label style="font-size:13px; font-weight:bold; color: var(--text-muted);">Second Number Range (1 - 100):</label>
+                <div class="range-container">
+                    <input type="number" id="num2-min" value="2" min="1" max="100" class="team-input-box" placeholder="Min">
+                    <span style="color: var(--text-muted)">to</span>
+                    <input type="number" id="num2-max" value="9" min="1" max="100" class="team-input-box" placeholder="Max">
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 12px;">
+                <button class="btn btn-slate" style="flex: 1;" onclick="showScreen('menu-screen')">Cancel</button>
+                <button class="btn btn-blue" style="flex: 2;" onclick="startGame()">Initialize Run</button>
+            </div>
+        </div>
+    </div>
+    <!-- Core Gameplay Screen -->
+    <div id="game-screen" class="screen">
+        <div class="game-title-header">ARITHMETRICKS</div>
+        <div class="game-header">
+            <div class="stat-box"><span class="stat-label">Progress</span><span id="stat-progress" class="stat-val">1/10</span></div>
+            <div class="stat-box"><span class="stat-label">Time Left</span><span id="stat-timer" class="stat-val">00:00</span></div>
+            <div class="stat-box"><span class="stat-label">Score</span><span id="stat-score" class="stat-val">0</span></div>
+        </div>
+
+        <div class="formula-card">
+            <div id="question-render-target"></div>
+        </div>
+
+        <div style="width:100%; max-width:500px;">
+            <div class="mcq-container">
+                <button id="mcq-btn-0" class="mcq-choice-btn" onclick="mcqSelect(0)"></button>
+                <button id="mcq-btn-1" class="mcq-choice-btn" onclick="mcqSelect(1)"></button>
+                <button id="mcq-btn-2" class="mcq-choice-btn" onclick="mcqSelect(2)"></button>
+                <button id="mcq-btn-3" class="mcq-choice-btn" onclick="mcqSelect(3)"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Screen -->
+    <div id="summary-screen" class="screen">
+        <div class="card" style="text-align: center;">
+            <h2 style="color: var(--accent-green); font-size: 28px; font-weight: 900; margin-bottom: 24px;">Run Analysis Report</h2>
+            <h1 id="win-announcement" style="font-size:30px; margin-bottom:20px; color:#f59e0b; font-weight:800; line-height:1.2;">-</h1>
+
+            <div style="background: rgba(15,23,42,0.5); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: left; margin-bottom: 24px; display: flex; flex-direction: column; gap: 12px;">
+                <div style="display: flex; justify-content:space-between;">
+                    <span style="color: var(--text-muted);">Operator Identity:</span>
+                    <span id="res-name" style="font-weight:bold;">-</span>
+                </div>
+                <div style="display: flex; justify-content:space-between;">
+                    <span style="color: var(--text-muted);">Total Accumulated Score:</span>
+                    <span id="res-score" style="font-weight:bold; color: var(--accent-blue); font-size: 20px;">0</span>
+                </div>
+                <div style="display: flex; justify-content:space-between;">
+                    <span style="color: var(--text-muted);">Elapsed Runtime Span:</span>
+                    <span id="res-time" style="font-weight:bold;">00:00</span>
+                </div>
+            </div>
+            <button class="btn btn-blue" style="width: 100%;" onclick="showScreen('settings-screen')">Restart Evaluation Matrix</button>
+        </div>
+    </div>
+    <script>
+        // State variables
+        let gameConfig = { name: "Mathematician", totalQ: 10, duration: 60, n1Min: 2, n1Max: 9, n2Min: 2, n2Max: 9 };
+        let gameSession = { currentQ: 1, score: 0, timeLeft: 0, timerId: null, startTime: 0, currentAnswer: 0 };
+        let questionPool = []; // Stores the pre-shuffled unique question matrix
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function startGame() {
+            // Read inputs
+            gameConfig.name = document.getElementById('player-name-input').value || "Mathematician";
+            gameConfig.totalQ = parseInt(document.getElementById('target-questions').value) || 10;
+            gameConfig.duration = parseInt(document.getElementById('time-limit').value) || 60;
+
+            // Constrain range values safely between 1 and 100
+            gameConfig.n1Min = Math.max(1, Math.min(100, parseInt(document.getElementById('num1-min').value) || 2));
+            gameConfig.n1Max = Math.max(1, Math.min(100, parseInt(document.getElementById('num1-max').value) || 9));
+            gameConfig.n2Min = Math.max(1, Math.min(100, parseInt(document.getElementById('num2-min').value) || 2));
+            gameConfig.n2Max = Math.max(1, Math.min(100, parseInt(document.getElementById('num2-max').value) || 9));
+
+            // Fix inversion errors dynamically
+            if(gameConfig.n1Min > gameConfig.n1Max) [gameConfig.n1Min, gameConfig.n1Max] = [gameConfig.n1Max, gameConfig.n1Min];
+            if(gameConfig.n2Min > gameConfig.n2Max) [gameConfig.n2Min, gameConfig.n2Max] = [gameConfig.n2Max, gameConfig.n2Min];
+
+            // Build a complete matrix pool of unique multiplication combinations
+            questionPool = [];
+            for (let i = gameConfig.n1Min; i <= gameConfig.n1Max; i++) {
+                for (let j = gameConfig.n2Min; j <= gameConfig.n2Max; j++) {
+                    questionPool.push({ num1: i, num2: j });
+                }
+            }
+
+            // Fisher-Yates Shuffle array to randomize selection sets flawlessly
+            for (let i = questionPool.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [questionPool[i], questionPool[j]] = [questionPool[j], questionPool[i]];
+            }
+
+            // Enforce caps if the total combinations are smaller than requested targets
+            if (gameConfig.totalQ > questionPool.length) {
+                gameConfig.totalQ = questionPool.length;
+            }
+
+            // Reset session state variables
+            gameSession.currentQ = 1;
+            gameSession.score = 0;
+            gameSession.timeLeft = gameConfig.duration;
+            gameSession.startTime = Date.now();
+
+            updateStatsHeader();
+            generateQuestion();
+            showScreen('game-screen');
+
+            clearInterval(gameSession.timerId);
+            gameSession.timerId = setInterval(runCountdown, 1000);
+        }
+
+        function runCountdown() {
+            gameSession.timeLeft--;
+            updateStatsHeader();
+            if (gameSession.timeLeft <= 0) {
+                endGameSession(false);
+            }
+        }
+
+        function updateStatsHeader() {
+            document.getElementById('stat-progress').innerText = `${gameSession.currentQ}/${gameConfig.totalQ}`;
+            document.getElementById('stat-score').innerText = gameSession.score;
+
+            let mins = Math.floor(gameSession.timeLeft / 60).toString().padStart(2, '0');
+            let secs = (gameSession.timeLeft % 60).toString().padStart(2, '0');
+            document.getElementById('stat-timer').innerText = `${mins}:${secs}`;
+        }
+
+        function generateQuestion() {
+            // Pull the next pre-shuffled unique question combination cleanly
+            let currentPair = questionPool[gameSession.currentQ - 1];
+            let num1 = currentPair.num1;
+            let num2 = currentPair.num2;
+
+            gameSession.currentAnswer = num1 * num2;
+            document.getElementById('question-render-target').innerText = `${num1} × ${num2}`;
+
+            // Create fake answers array
+            let choices = new Set([gameSession.currentAnswer]);
+            while (choices.size < 4) {
+                let offFactor1 = num1 + (Math.floor(Math.random() * 5) - 2);
+                let offFactor2 = num2 + (Math.floor(Math.random() * 5) - 2);
+                offFactor1 = Math.max(1, offFactor1);
+                offFactor2 = Math.max(1, offFactor2);
+
+                let fakeAns = offFactor1 * offFactor2;
+                if(fakeAns !== gameSession.currentAnswer && fakeAns > 0) {
+                    choices.add(fakeAns);
+                }
+            }
+
+            // Shuffle array choices seamlessly
+            let choicesArr = Array.from(choices).sort(() => Math.random() - 0.5);
+            for (let i = 0; i < 4; i++) {
+                let btn = document.getElementById(`mcq-btn-${i}`);
+                btn.innerText = choicesArr[i];
+                btn.style.animation = "";
+                btn.dataset.value = choicesArr[i];
+            }
+        }
+
+        function mcqSelect(index) {
+            let btn = document.getElementById(`mcq-btn-${index}`);
+            let chosenVal = parseInt(btn.dataset.value);
+
+            if (chosenVal === gameSession.currentAnswer) {
+                gameSession.score += 10;
+                btn.style.animation = "popGreen 0.4s ease-out";
+            } else {
+                gameSession.score = Math.max(0, gameSession.score - 5);
+                btn.style.animation = "popRed 0.4s ease-out";
+            }
+
+            setTimeout(() => {
+                if (gameSession.currentQ >= gameConfig.totalQ) {
+                    endGameSession(true);
+                } else {
+                    gameSession.currentQ++;
+                    updateStatsHeader();
+                    generateQuestion();
+                }
+            }, 300);
+        }
+
+        function endGameSession(completedAll) {
+            clearInterval(gameSession.timerId);
+
+            let elapsedTotal = Math.floor((Date.now() - gameSession.startTime) / 1000);
+            let mins = Math.floor(elapsedTotal / 60).toString().padStart(2, '0');
+            let secs = (elapsedTotal % 60).toString().padStart(2, '0');
+
+            document.getElementById('res-name').innerText = gameConfig.name;
+            document.getElementById('res-score').innerText = gameSession.score;
+            document.getElementById('res-time').innerText = `${mins}:${secs}`;
+
+            let headline = document.getElementById('win-announcement');
+            if (completedAll) {
+                headline.innerText = "MATRIX RUN CLEARED!";
+                headline.style.color = "var(--accent-green)";
+            } else {
+                headline.innerText = "RUN TIME EXPIRED!";
+                headline.style.color = "var(--accent-red)";
+            }
+            showScreen('summary-screen');
+        }
+    </script>
+
+</body>
+</html>
